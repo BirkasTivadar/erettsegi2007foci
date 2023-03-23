@@ -18,8 +18,17 @@ public class FociMain {
         bajnoksag.printFordulo(fordulo);
         System.out.println();
 
-//    3. feladat
+//      3. feladat
         System.out.println("3. feladat:");
         bajnoksag.printForditottMeccsek();
+
+//      4. feladat
+        System.out.println("4. feladat:");
+        System.out.println("kérem a csapat nevét: ");
+        String csapat = scanner.nextLine();
+
+//      5. feladat
+        System.out.println("5. feladat:");
+        bajnoksag.printCsapatGolok(csapat);
     }
 }

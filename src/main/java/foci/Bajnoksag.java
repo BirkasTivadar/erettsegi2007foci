@@ -66,4 +66,19 @@ public class Bajnoksag {
             System.out.printf("%s %s%n", meccs.fordulo(), meccs.vendegCsapat());
         }
     }
+
+    public void printCsapatGolok(String csapat) {
+        int lottGolok = 0;
+        int kapottGolok = 0;
+        for (Meccs meccs : meccsList) {
+            if (meccs.hazaiCsapat().equals(csapat)) {
+                lottGolok += meccs.hazaiGolokVege();
+                kapottGolok += meccs.vendegGolokVege();
+            } else if (meccs.vendegCsapat().equals(csapat)) {
+                lottGolok += meccs.vendegGolokVege();
+                kapottGolok += meccs.hazaiGolokVege();
+            }
+        }
+        System.out.printf("lőtt: %d kapott: %d", lottGolok, kapottGolok);
+    }
 }
