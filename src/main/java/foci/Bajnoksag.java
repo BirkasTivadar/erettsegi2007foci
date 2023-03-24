@@ -1,11 +1,14 @@
 package foci;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Bajnoksag {
 
@@ -20,11 +23,14 @@ public class Bajnoksag {
         } catch (IOException ioException) {
             throw new IllegalStateException("Can not read file", ioException);
         }
+        meccsList.sort((meccs1, meccs2) -> {
+            return meccs1.fordulo() - meccs2.fordulo();
+        });
     }
 
     private void loadLines(String line) {
         String[] meccsAdatok = line.split(" ");
-        String fordulo = meccsAdatok[0];
+        int fordulo = Integer.parseInt(meccsAdatok[0]);
         int hazaiGolokVege = Integer.parseInt(meccsAdatok[1]);
         int vendegGolokVege = Integer.parseInt(meccsAdatok[2]);
         int hazaiGolokFelido = Integer.parseInt(meccsAdatok[3]);
@@ -38,9 +44,9 @@ public class Bajnoksag {
         return List.copyOf(meccsList);
     }
 
-    public void printFordulo(String fordulo) {
+    public void printFordulo(int fordulo) {
         meccsList.stream()
-                .filter(meccs -> meccs.fordulo().equals(fordulo))
+                .filter(meccs -> meccs.fordulo() == fordulo)
                 .forEach(this::printMeccs);
     }
 
@@ -80,5 +86,34 @@ public class Bajnoksag {
             }
         }
         System.out.printf("lőtt: %d kapott: %d", lottGolok, kapottGolok);
+    }
+
+    public String elsoVereseg(String csapat) {
+        return meccsList.stream()
+                .filter(meccs -> meccs.hazaiCsapat().equals(csapat) && meccs.vendegGolokVege() > meccs.hazaiGolokVege())
+                .findFirst()
+                .map(meccs -> String.format("%d %s", meccs.fordulo(), meccs.vendegCsapat()))
+                .orElse("A csapat otthon veretlen maradt.");
+    }
+
+    public Map<String, Integer> getEredmenyek() {
+        Map<String, Integer> result = new HashMap<>();
+        meccsList.forEach(meccs -> result.merge(meccs.vegEredmeny(), 1, Integer::sum));
+        return result;
+    }
+
+    public void writeToFile(Path path) {
+        Map<String, Integer> eredmenyek = getEredmenyek();
+        try (BufferedWriter bufferedWriter = Files.newBufferedWriter(path)) {
+            for (Map.Entry<String, Integer> entry : eredmenyek.entrySet()) {
+                bufferedWriter.write(entry.getKey()
+                        .concat(": ")
+                        .concat(entry.getValue().toString())
+                        .concat(" darab")
+                        .concat(System.lineSeparator()));
+            }
+        } catch (IOException ioException) {
+            throw new IllegalStateException("Can not write file", ioException);
+        }
     }
 }
